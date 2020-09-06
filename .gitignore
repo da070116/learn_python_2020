@@ -1,4 +1,5 @@
-tlgrm.log
+*.pyc
+*.log
 settings.py
 .idea
 __pycache__
