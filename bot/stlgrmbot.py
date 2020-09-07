@@ -1,4 +1,5 @@
 import logging
+import ephem
 from telegram.ext import CommandHandler, Updater, MessageHandler, Filters
 from bot import settings
 
@@ -12,10 +13,21 @@ def echo(update, context):
     update.message.reply_text(received_message)
 
 
+def planet_location(update, context):
+    requested_planet = update.message.text.split("/planet")[1].strip()
+
+    planet_function = getattr(ephem, requested_planet)
+    if planet_function:
+        planet = planet_function(str(update.message.date))
+        constellation = ephem.constellation(planet)[1]
+        update.message.reply_text(f"Today {requested_planet} is in {constellation} that won't affect on your fate")
+
+
 def main():
     tlgrmbot = Updater(settings.API_KEY, use_context=True)
     dispatcher = tlgrmbot.dispatcher
     dispatcher.add_handler(CommandHandler('start', greet))
+    dispatcher.add_handler(CommandHandler('planet', planet_location))
     dispatcher.add_handler(MessageHandler(Filters.text, echo))
     logging.info("Bot started")
     tlgrmbot.start_polling()
