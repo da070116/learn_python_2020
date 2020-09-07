@@ -10,9 +10,10 @@ def string_comparator(first_str: str, second_str: str):
         return 2
 
 
-print(string_comparator(1, "e"))
-print(string_comparator("1", "e"))
-print(string_comparator("1qw", "e"))
-print(string_comparator("1qw", "learn"))
-print(string_comparator("definately_longer_string", "learn"))
-print(string_comparator("learn", "learn"))
+if __name__ == '__main__':
+    print(string_comparator(1, "e"))
+    print(string_comparator("1", "e"))
+    print(string_comparator("1qw", "e"))
+    print(string_comparator("1qw", "learn"))
+    print(string_comparator("definately_longer_string", "learn"))
+    print(string_comparator("learn", "learn"))
