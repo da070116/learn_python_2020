@@ -12,6 +12,6 @@ def define_activity(age: int) -> str:
     return activity
 
 
-user_age = int(input("What is your age? "))
-
-print(f"You should {define_activity(user_age)} by the age of {user_age}")
+if __name__ == '__main__':
+    user_age = int(input("What is your age? "))
+    print(f"You should {define_activity(user_age)} by the age of {user_age}")
