@@ -1,5 +1,7 @@
 *.pyc
 *.log
+*.txt
+*.csv
 settings.py
 .idea
 __pycache__
