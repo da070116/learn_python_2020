@@ -5,7 +5,9 @@ from bot import settings
 
 
 def greet(update, context):
-    update.message.reply_text(f"Hello, {update.effective_user.first_name}! I'm started")
+    update.message.reply_text(
+        f"Hello, {update.effective_user.first_name}! I'm started"
+    )
 
 
 def echo(update, context):
@@ -14,13 +16,15 @@ def echo(update, context):
 
 
 def planet_location(update, context):
-    requested_planet = update.message.text.split("/planet")[1].strip()
-
-    planet_function = getattr(ephem, requested_planet)
+    planet = update.message.text.split("/planet")[1].strip()
+    try:
+        planet_function = getattr(ephem, planet)
+    except AttributeError:
+        update.message.reply_text("No such planet.")
     if planet_function:
         planet = planet_function(str(update.message.date))
         constellation = ephem.constellation(planet)[1]
-        update.message.reply_text(f"Today {requested_planet} is in {constellation} that won't affect on your fate")
+        update.message.reply_text(f"Today {planet} is in {constellation}")
 
 
 def main():
@@ -36,5 +40,9 @@ def main():
 
 if __name__ == '__main__':
     formatter = '%(levelname)s at %(asctime)s:%(name)s:%(message)s'
-    logging.basicConfig(filename='tlgrm.log', level=logging.INFO, format=formatter)
+    logging.basicConfig(
+        filename='tlgrm.log',
+        level=logging.INFO,
+        format=formatter
+    )
     main()

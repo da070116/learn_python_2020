@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 if __name__ == '__main__':
     dt_now = datetime.now()
     dt_generated = datetime(year=2022, month=2, day=2, hour=22, minute=22)
-    delta = dt_generated - dt_now
+    # delta = dt_generated - dt_now
     # shorter and more comfortable version
     delta = timedelta(days=1)
     dt_compared = datetime(year=2022, month=2, day=4, hour=22, minute=22)
@@ -32,3 +32,8 @@ if __name__ == '__main__':
     print(f"Yesterday was: {date_modified.strftime('%d.%m.%Y')}")
     date_modified = dt_now.replace(month=dt_now.month-1)
     print(f"A month ago was: {date_modified.strftime('%d.%m.%Y')}")
+
+    print("String to datetime conversion")
+    dt_string = '01/01/25 12:10:03.234567'
+    dt = datetime.strptime(dt_string, '%m/%d/%y %H:%M:%S.%f')
+    print(dt_string, dt, type(dt))
