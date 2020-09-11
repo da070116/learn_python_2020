@@ -17,14 +17,14 @@ def echo(update, context):
 
 def planet_location(update, context):
     planet = update.message.text.split("/planet")[1].strip()
-    try:
+    possible_planets = [name for _0, _1, name in ephem._libastro.builtin_planets()]
+    if planet in possible_planets:
         planet_function = getattr(ephem, planet)
-    except AttributeError:
-        update.message.reply_text("No such planet.")
-    if planet_function:
         planet = planet_function(str(update.message.date))
         constellation = ephem.constellation(planet)[1]
         update.message.reply_text(f"Today {planet} is in {constellation}")
+    else:
+        update.message.reply_text(f"{planet} is not in our solar system. Live and prosper, friend!")
 
 
 def main():

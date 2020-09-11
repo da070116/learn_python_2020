@@ -2,7 +2,8 @@
 # Необходимо вывести имена всех учеников из списка с новой строки
 
 names = ['Оля', 'Петя', 'Вася', 'Маша']
-print(*[name for name in names], sep='\n')
+for name in names:
+    print(name)
 
 
 # Задание 2
@@ -10,7 +11,8 @@ print(*[name for name in names], sep='\n')
 # рядом с именем показать количество букв в нём.
 
 names = ['Оля', 'Петя', 'Вася', 'Маша']
-print(*[f"{name}, {len(name)}" for name in names])
+for name in names:
+    print(name, len(name))
 
 
 # Задание 3
@@ -24,11 +26,12 @@ is_male = {
   'Маша': False,
 }
 names = ['Оля', 'Петя', 'Вася', 'Маша']
-print(*[f"{n[0]} is {'male' if n[1] else 'female'};" for n in is_male.items()])
+for name in is_male.items():
+    print(name[0], 'male' if name[1] else 'female')
 
 
 # Задание 4
-# Даны группу учеников. Нужно вывести количество групп
+# Даны группы учеников. Нужно вывести количество групп
 # и для каждой группы – количество учеников в ней
 # Пример вывода:
 # Всего 2 группы.
@@ -40,12 +43,12 @@ groups = [
   ['Оля', 'Петя', 'Гриша'],
 ]
 print(f'{groups} \nThere are {len(groups)} groups')
-for cnt, group in enumerate(groups):
-    print(f"There are {len(group)} pupils in group # {cnt+1}")
+for cnt, group in enumerate(groups, start=1):
+    print(f"There are {len(group)} pupils in group # {cnt}")
 
 
 # Задание 5
-# Для каждой пары учеников нужно с новой строки перечислить учеников,
+# Для каждой группы учеников нужно с новой строки перечислить учеников,
 # которые в неё входят.
 # Пример:
 # Группа 1: Вася, Маша
@@ -55,5 +58,5 @@ groups = [
   ['Вася', 'Маша'],
   ['Оля', 'Петя', 'Гриша'],
 ]
-for cnt, group in enumerate(groups):
-    print(f'Group {cnt+1}: {", ".join([person for person in group])}')
+for cnt, group in enumerate(groups, start=1):
+    print(f'Group {cnt}: {", ".join([person for person in group])}')
