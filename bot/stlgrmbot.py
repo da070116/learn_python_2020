@@ -26,23 +26,25 @@ def full_moon(update, context):
 
 def planet_location(update, context):
     planet = update.message.text.split("/planet")[1].strip()
-    possible_planets = [name for _0, _1, name in ephem._libastro.builtin_planets()]
+    possible_planets = [n for _0, _1, n in ephem._libastro.builtin_planets()]
     if planet in possible_planets:
         planet_function = getattr(ephem, planet)
         planet = planet_function(str(update.message.date))
         constellation = ephem.constellation(planet)[1]
         update.message.reply_text(f"Today {planet} is in {constellation}")
     else:
-        update.message.reply_text(f"{planet} is not in our solar system. Live and prosper, friend!")
+        msg = ' is not in our solar system. Live and prosper, friend!'
+        update.message.reply_text(f"{planet} {msg}")
 
 
 def word_count(update, context):
-    test_string = update.message.text.split("/wordcount")[1].strip()
-    if test_string:
-        update.message.reply_text(f"{len([x for x in test_string.split(' ') if x.strip()])} words")
+    test_str = update.message.text.split("/wordcount")[1].strip()
+    if test_str:
+        update.message.reply_text(
+            f"{len([x for x in test_str.split(' ') if x.strip()])} words"
+        )
     else:
         update.message.reply_text('The string is not valid')
-
 
 
 def main():
