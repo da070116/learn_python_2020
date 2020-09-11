@@ -1,4 +1,6 @@
 import logging
+from datetime import datetime
+
 import ephem
 from telegram.ext import CommandHandler, Updater, MessageHandler, Filters
 from bot import settings
@@ -17,7 +19,9 @@ def echo(update, context):
 
 def full_moon(update, context):
     date_string = update.message.text.split("/fm")[1].strip()
-
+    dt = datetime.strptime(date_string, "%Y-%m-%d")
+    print(dt)
+    update.message.reply_text("ok")
 
 
 def planet_location(update, context):
