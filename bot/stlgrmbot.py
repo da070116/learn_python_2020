@@ -15,6 +15,11 @@ def echo(update, context):
     update.message.reply_text(received_message)
 
 
+def full_moon(update, context):
+    date_string = update.message.text.split("/fm")[1].strip()
+
+
+
 def planet_location(update, context):
     planet = update.message.text.split("/planet")[1].strip()
     possible_planets = [name for _0, _1, name in ephem._libastro.builtin_planets()]
@@ -27,11 +32,22 @@ def planet_location(update, context):
         update.message.reply_text(f"{planet} is not in our solar system. Live and prosper, friend!")
 
 
+def word_count(update, context):
+    test_string = update.message.text.split("/wordcount")[1].strip()
+    if test_string:
+        update.message.reply_text(f"{len([x for x in test_string.split(' ') if x.strip()])} words")
+    else:
+        update.message.reply_text('The string is not valid')
+
+
+
 def main():
     tlgrmbot = Updater(settings.API_KEY, use_context=True)
     dispatcher = tlgrmbot.dispatcher
     dispatcher.add_handler(CommandHandler('start', greet))
+    dispatcher.add_handler(CommandHandler('wordcount', word_count))
     dispatcher.add_handler(CommandHandler('planet', planet_location))
+    dispatcher.add_handler(CommandHandler('fm', full_moon))
     dispatcher.add_handler(MessageHandler(Filters.text, echo))
     logging.info("Bot started")
     tlgrmbot.start_polling()
