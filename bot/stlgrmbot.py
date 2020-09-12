@@ -1,5 +1,8 @@
 import logging
+from datetime import datetime
+
 import ephem
+
 from telegram.ext import CommandHandler, Updater, MessageHandler, Filters
 from bot import settings
 
@@ -17,7 +20,13 @@ def echo(update, context):
 
 def full_moon(update, context):
     date_string = update.message.text.split("/fm")[1].strip()
-    update.message.reply_text(date_string)
+    try:
+        date = datetime.strptime(date_string, '%Y-%m-%d')
+        update.message.reply_text(
+            f'Next full moon will be {ephem.next_full_moon(date)}'
+        )
+    except ValueError:
+        update.message.reply_text('Date should be in YYYY-mm-dd format')
 
 
 def planet_location(update, context):
