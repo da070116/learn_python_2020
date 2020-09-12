@@ -1,7 +1,46 @@
 import logging
+import re
+from typing import List
+from urllib.request import urlopen
+from datetime import datetime
 import ephem
 from telegram.ext import CommandHandler, Updater, MessageHandler, Filters
 from bot import settings
+from bs4 import BeautifulSoup
+
+
+def get_links() -> List[str]:
+    soup = BeautifulSoup(
+        urlopen('http://www.1000mest.ru/cityA'), 'html.parser'
+    )
+    return [a.get('href')
+            for a in soup.find_all('a') if a.get('href').startswith('city')
+            ]
+
+
+def obtain_cities_list():
+    get_links()
+    cities_list = []
+    tag_rem = re.compile(r'<[^>]+>')
+    for link in get_links():
+        soup = BeautifulSoup(
+            urlopen(f'http://www.1000mest.ru/{link}'), 'html.parser'
+        )
+        for x in soup.find_all('td'):
+            city_name = tag_rem.sub('', str(x))
+            if '(' in city_name:
+                city_name = city_name.split('(')[0]
+            cities_list.append(city_name)
+    return cities_list
+
+
+def city(update, context):
+    all_cities = obtain_cities_list()
+    try_city = update.message.text.split("/city")[1].strip()
+    if try_city in all_cities:
+        pass
+    else:
+        update.message.reply_text(f'{try_city} is unknown')
 
 
 def greet(update, context):
@@ -17,7 +56,13 @@ def echo(update, context):
 
 def full_moon(update, context):
     date_string = update.message.text.split("/fm")[1].strip()
-    update.message.reply_text(date_string)
+    try:
+        date = datetime.strptime(date_string, '%Y-%m-%d')
+        update.message.reply_text(
+            f'Next full moon will be {ephem.next_full_moon(date)}'
+        )
+    except ValueError:
+        update.message.reply_text('Date should be in YYYY-mm-dd format')
 
 
 def planet_location(update, context):
@@ -45,6 +90,7 @@ def word_count(update, context):
 
 
 def main():
+    print(obtain_cities_list())
     tlgrmbot = Updater(settings.API_KEY, use_context=True)
     dispatcher = tlgrmbot.dispatcher
     dispatcher.add_handler(CommandHandler('start', greet))
