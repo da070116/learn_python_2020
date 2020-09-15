@@ -1,5 +1,6 @@
 import logging
 import re
+# from random import randint
 from typing import List
 from urllib.request import urlopen
 from datetime import datetime
@@ -34,13 +35,59 @@ def obtain_cities_list():
     return cities_list
 
 
+def get_last_letter(city, city_list):
+    for letter in city[::-1]:
+        for item in city_list:
+            if item.lower()[0] == letter:
+                return letter
+
+
 def city(update, context):
-    all_cities = obtain_cities_list()
-    try_city = update.message.text.split("/city")[1].strip()
-    if try_city in all_cities:
-        pass
+    user_input = context.args[0].lower().strip()
+    if context.user_data.get('game') is None or context.user_data.get('end_game') is True:
+        context.user_data['game'] = True
+        cities = {'Москва', 'Санкт-Петербург', 'Казань', 'Миасс', 'Никольск', 'Астана'}
+        first_letter = user_input[0]
+        print(f'First letter from input {first_letter=}')
     else:
-        update.message.reply_text(f'{try_city} is unknown')
+        cities = context.user_data['cities']
+        first_letter = context.user_data['first_letter']
+        print(f'First letter from context {first_letter=}')
+    if user_input in [city_name.lower() for city_name in cities]:
+        if first_letter == user_input[0]:
+            last_letter = get_last_letter(user_input, cities)
+            answer_list = [answer_city.lower() for answer_city in cities
+                           if answer_city.lower()[0] == last_letter
+                           and not answer_city.lower() == user_input
+                           ]
+            if len(answer_list) > 0:
+                update.message.reply_text(f'Your city is {user_input}, {first_letter=}, {last_letter=}')
+            else:
+                update.message.reply_text("No city left to reply")
+                context.user_data['end_game'] = True
+
+            context.user_data['cities'] = cities
+            context.user_data['first_letter'] = last_letter
+        else:
+            update.message.reply_text(f'Your city should start with {first_letter}')
+    else:
+        context.user_data['cities'] = cities
+        update.message.reply_text(f'Your city ({user_input}) is not in known list')
+    # if context.user_data.get('game') is None:
+    #     context.user_data['game'] = True
+    #     cities = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5']
+    # else:
+    #     cities = context.user_data['cities']
+    # user_input = context.args[-1]
+    # print(f"{cities=}, {user_input=}")
+    # if user_input in cities:
+    #     print("Match")
+    #     cities.pop()
+    #     context.user_data['cities'] = cities
+    #     update.message.reply_text(len(context.user_data['cities']))
+    # else:
+    #     update.message.reply_text(f'{user_input} is unknown')
+
 
 
 def greet(update, context):
@@ -90,13 +137,14 @@ def word_count(update, context):
 
 
 def main():
-    print(obtain_cities_list())
+
     tlgrmbot = Updater(settings.API_KEY, use_context=True)
     dispatcher = tlgrmbot.dispatcher
     dispatcher.add_handler(CommandHandler('start', greet))
     dispatcher.add_handler(CommandHandler('wordcount', word_count))
     dispatcher.add_handler(CommandHandler('planet', planet_location))
     dispatcher.add_handler(CommandHandler('fm', full_moon))
+    dispatcher.add_handler(CommandHandler('c', city))
     dispatcher.add_handler(MessageHandler(Filters.text, echo))
     logging.info("Bot started")
     tlgrmbot.start_polling()
