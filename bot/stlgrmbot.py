@@ -1,5 +1,6 @@
 import logging
 import re
+# from random import randint
 from typing import List
 from urllib.request import urlopen
 from datetime import datetime
@@ -35,12 +36,35 @@ def obtain_cities_list():
 
 
 def city(update, context):
-    all_cities = obtain_cities_list()
-    try_city = update.message.text.split("/city")[1].strip()
-    if try_city in all_cities:
-        pass
+    if context.user_data.get('game') is None:
+        context.user_data['game'] = True
+        cities = ['A1', 'A2', 'A3', 'A4', 'A5']
     else:
-        update.message.reply_text(f'{try_city} is unknown')
+        cities = context.user_data['cities']
+    user_input = context.args[0].lower()
+    if user_input.strip() in [c.lower() for c in cities]:
+        cities.pop()
+        context.user_data['cities'] = cities
+        update.message.reply_text(len(context.user_data['cities']))
+    else:
+        update.message.reply_text(f'{user_input} is unknown')
+
+    # try_city = context.args[0].lower().strip()
+    # if not context.user_data.get('game'):
+    #     context.user_data['game'] = 'playing'
+    #     all_cities = obtain_cities_list()
+    # else:
+    #     all_cities = context.user_data['cities']
+    # if try_city in all_cities:
+    #     letter = try_city[-1]
+    #     available_cities = [c for c in all_cities if c[0].lower == letter]
+    #     rand_num = randint(len(available_cities))
+    #     answer = available_cities[rand_num]
+    #     all_cities.remove(answer)
+    #     context.user_data['cities'] = all_cities
+    #     update.message.reply_text(answer)
+    # else:
+    #     update.message.reply_text(f'{try_city} is unknown')
 
 
 def greet(update, context):
@@ -90,13 +114,14 @@ def word_count(update, context):
 
 
 def main():
-    print(obtain_cities_list())
+
     tlgrmbot = Updater(settings.API_KEY, use_context=True)
     dispatcher = tlgrmbot.dispatcher
     dispatcher.add_handler(CommandHandler('start', greet))
     dispatcher.add_handler(CommandHandler('wordcount', word_count))
     dispatcher.add_handler(CommandHandler('planet', planet_location))
     dispatcher.add_handler(CommandHandler('fm', full_moon))
+    dispatcher.add_handler(CommandHandler('c', city))
     dispatcher.add_handler(MessageHandler(Filters.text, echo))
     logging.info("Bot started")
     tlgrmbot.start_polling()
