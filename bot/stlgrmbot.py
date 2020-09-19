@@ -49,7 +49,7 @@ def main():
     dispatcher.add_handler(CommandHandler('wordcount', word_count))
     dispatcher.add_handler(CommandHandler('planet', astronomy.planet_location))
     dispatcher.add_handler(CommandHandler('fm', astronomy.full_moon))
-    dispatcher.add_handler(CommandHandler('c', city.game))
+    dispatcher.add_handler(CommandHandler('city', city.game_logic))
     dispatcher.add_handler(MessageHandler(Filters.text, echo))
     logging.info("Bot started")
     telegram_bot.start_polling()
