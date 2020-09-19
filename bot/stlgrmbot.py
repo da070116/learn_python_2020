@@ -1,48 +1,38 @@
 import logging
-from datetime import datetime
-import ephem
 from telegram.ext import CommandHandler, Updater, MessageHandler, Filters
-from bot import settings
-from bot.city_game import city
+from bot import settings, astronomy, city
 
 
 def greet(update, context):
+    """
+    Greeting message
+    :param update:
+    :param context: Variables of this chat
+    :return: "Hello, %name%"
+    """
     update.message.reply_text(
         f"Hello, {update.effective_user.first_name}! I'm started"
     )
 
 
 def echo(update, context):
+    """
+    Print the same message that user send
+    :param update:
+    :param context:
+    :return:
+    """
     received_message = update.message.text
     update.message.reply_text(received_message)
 
 
-def full_moon(update, context):
-    date_string = update.message.text.split("/fm")[1].strip()
-    try:
-        date = datetime.strptime(date_string, '%Y-%m-%d')
-        update.message.reply_text(
-            f'Next full moon will be {ephem.next_full_moon(date)}'
-        )
-    except ValueError:
-        update.message.reply_text('Date should be in YYYY-mm-dd format')
-
-
-def planet_location(update, context):
-    planet = update.message.text.split("/planet")[1].strip()
-    possible_planets = [n for _0, _1, n in ephem._libastro.builtin_planets()]
-    if planet in possible_planets:
-        planet_function = getattr(ephem, planet)
-        planet = planet_function(str(update.message.date))
-        constellation = ephem.constellation(planet)[1]
-        update.message.reply_text(f"Today {planet} is in {constellation}")
-    else:
-        update.message.reply_text(
-            f"{planet} is not in our solar system. Live and prosper, friend!"
-        )
-
-
 def word_count(update, context):
+    """
+    Count the number of words in message
+    :param update:
+    :param context:
+    :return:
+    """
     test_string = update.message.text.split("/wordcount")[1].strip()
     if test_string:
         update.message.reply_text(
@@ -53,18 +43,17 @@ def word_count(update, context):
 
 
 def main():
-
-    tlgrmbot = Updater(settings.API_KEY, use_context=True)
-    dispatcher = tlgrmbot.dispatcher
+    telegram_bot = Updater(settings.API_KEY, use_context=True)
+    dispatcher = telegram_bot.dispatcher
     dispatcher.add_handler(CommandHandler('start', greet))
     dispatcher.add_handler(CommandHandler('wordcount', word_count))
-    dispatcher.add_handler(CommandHandler('planet', planet_location))
-    dispatcher.add_handler(CommandHandler('fm', full_moon))
-    dispatcher.add_handler(CommandHandler('c', city))
+    dispatcher.add_handler(CommandHandler('planet', astronomy.planet_location))
+    dispatcher.add_handler(CommandHandler('fm', astronomy.full_moon))
+    dispatcher.add_handler(CommandHandler('c', city.game))
     dispatcher.add_handler(MessageHandler(Filters.text, echo))
     logging.info("Bot started")
-    tlgrmbot.start_polling()
-    tlgrmbot.idle()
+    telegram_bot.start_polling()
+    telegram_bot.idle()
 
 
 if __name__ == '__main__':

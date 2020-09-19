@@ -5,20 +5,19 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
 
-def get_cities_from_site() -> List[str]:
+def get_links_from_site() -> List[str]:
     soup = BeautifulSoup(
         urlopen('http://www.1000mest.ru/cityA'), 'html.parser'
     )
-    return [a.get('href')
-            for a in soup.find_all('a') if a.get('href').startswith('city')
+    return [a.get('href') for a in soup.find_all('a')
+            if a.get('href').startswith('city')
             ]
 
 
 def obtain_cities_list():
-    print("OSL started")
     cities_list = []
     tag_rem = re.compile(r'<[^>]+>')
-    for link in get_cities_from_site():
+    for link in get_links_from_site():
         soup = BeautifulSoup(
             urlopen(f'http://www.1000mest.ru/{link}'), 'html.parser'
         )
@@ -27,7 +26,6 @@ def obtain_cities_list():
             if '(' in city_name:
                 city_name = city_name.split('(')[0]
             cities_list.append(city_name)
-    print(len(cities_list))
     return cities_list
 
 
@@ -55,7 +53,7 @@ def initialize(data):
     return _user_city, _first_letter, _cities
 
 
-def city(update, context):
+def game(update, context):
     (user_city, first_letter, cities) = initialize(context)
     if None in (user_city, first_letter, cities):
         result = "Critical error"
@@ -72,7 +70,7 @@ def city(update, context):
             context.user_data['end_game'] = True
         else:
             answer = answer_list[randint(0, len(answer_list)-1)]
-            result = f"{user_city} - {answer}"
+            result = f'Your city was {user_city}. I reply with "{answer}"'
             cities.remove(answer)
             context.user_data["first_letter"] = get_last(answer, cities)
             context.user_data["cities"] = cities
